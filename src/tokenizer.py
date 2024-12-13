@@ -36,4 +36,4 @@ class Tokenizer:
             json.dump({
                 "token_to_id": self.vocab.token_to_id,
                 "token_freq": self.vocab.token_freq,
-            }, file, indent=4)
+            }, file, indent=4)  # type: ignore

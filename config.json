@@ -1,0 +1,7 @@
+{
+    "data": "bryant-stories.txt",
+    "tokenizer": null,
+    "window_step": 1,
+    "context_length": 40,
+    "output_length": 1
+}
