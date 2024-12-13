@@ -1,7 +1,15 @@
 {
     "data": "bryant-stories.txt",
     "tokenizer": null,
+    "seed": 42,
     "window_step": 1,
     "context_length": 40,
-    "output_length": 1
+    "output_length": 1,
+    "batch_size": 64,
+    "epochs": 100,
+    "save_interval": 10,
+    "learning_rate": 1e-3,
+    "embedding_dim": 128,
+    "hidden_dim": 256,
+    "num_layers": 2
 }

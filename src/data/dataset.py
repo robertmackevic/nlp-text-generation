@@ -6,8 +6,7 @@ from nltk.corpus import gutenberg
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from src.tokenizer import Tokenizer
-from src.utils import nearest_divisible
+from src.data.tokenizer import Tokenizer
 
 
 class TextGenerationDataset(Dataset):
@@ -30,7 +29,7 @@ class TextGenerationDataset(Dataset):
         )
 
     def __len__(self) -> int:
-        return int(nearest_divisible(len(self.text), self.window_size) / self.config.window_step)
+        return int((len(self.text) - self.window_size) / self.config.window_step)
 
     def __getitem__(self, index: int) -> Tuple[Tensor, Tensor]:
         start_index = index * self.config.window_step

@@ -3,10 +3,9 @@ from pathlib import Path
 from typing import Self
 
 import torch
-from torch.nn.functional import one_hot
 
+from src.data.vocab import Vocab
 from src.paths import TOKENIZER_FILE
-from src.vocab import Vocab
 
 
 class Tokenizer:
@@ -24,12 +23,10 @@ class Tokenizer:
             return cls(Vocab(tokenizer_data["token_to_id"], tokenizer_data["token_freq"]))
 
     def encode(self, text: str) -> torch.Tensor:
-        token_ids = [self.vocab.token_to_id.get(token, Vocab.UNK_TOKEN["id"]) for token in text]
-        return one_hot(torch.tensor(token_ids), num_classes=len(self.vocab)).float()
+        return torch.tensor([self.vocab.token_to_id.get(token, Vocab.UNK_TOKEN["id"]) for token in text])
 
-    def decode(self, one_hot_tensor: torch.Tensor) -> str:
-        token_ids = torch.argmax(one_hot_tensor, dim=1).tolist()
-        return "".join(self.vocab.id_to_token.get(token_id, Vocab.UNK_TOKEN["token"]) for token_id in token_ids)
+    def decode(self, tensor: torch.Tensor) -> str:
+        return "".join(self.vocab.id_to_token.get(token_id, Vocab.UNK_TOKEN["token"]) for token_id in tensor.tolist())
 
     def save(self, filepath: Path) -> None:
         with open(filepath, "w") as file:

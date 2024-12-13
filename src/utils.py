@@ -1,9 +1,14 @@
 import json
 import logging
+import random
 import sys
 from argparse import Namespace
 from pathlib import Path
 from typing import Optional
+
+import numpy as np
+import torch
+from torch.nn import Module
 
 from src.paths import CONFIG_FILE
 
@@ -29,5 +34,29 @@ def save_config(config: Namespace, filepath: Path) -> None:
         json.dump(vars(config), file, indent=4)  # type: ignore
 
 
-def nearest_divisible(x: int, y: int) -> int:
-    return x - (x % y) if x % y <= y / 2 else x + (y - x % y)
+def get_available_device() -> torch.device:
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def count_parameters(module: Module, trainable: bool = False) -> int:
+    return sum(p.numel() for p in module.parameters() if not trainable or (trainable and p.requires_grad))
+
+
+def load_weights(filepath: Path, model: Module) -> Module:
+    checkpoint = torch.load(filepath, map_location=get_available_device(), weights_only=True)
+    model.load_state_dict(checkpoint)
+    return model
+
+
+def save_weights(filepath: Path, model: Module) -> None:
+    torch.save(model.state_dict(), filepath)
+
+
+def seed_everything(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
