@@ -1,6 +1,6 @@
 {
-    "data": "bryant-stories.txt",
-    "tokenizer": null,
+    "data": "milton-paradise.txt",
+    "test_fraction": 0.2,
     "seed": 42,
     "window_step": 1,
     "context_length": 40,
@@ -8,8 +8,10 @@
     "batch_size": 64,
     "epochs": 100,
     "save_interval": 10,
+    "eval_interval": 1,
+    "best_score_metric": "accuracy",
     "learning_rate": 1e-3,
-    "embedding_dim": 128,
-    "hidden_dim": 256,
-    "num_layers": 2
+    "embedding_dim": 256,
+    "hidden_dim": 512,
+    "num_layers": 3
 }

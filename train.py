@@ -1,6 +1,4 @@
-from torch.utils.data import DataLoader
-
-from src.data.dataset import TextGenerationDataset
+from src.data.dataset import TextGenerationDataset, get_dataloaders
 from src.trainer import Trainer
 from src.utils import get_logger, load_config, seed_everything, count_parameters
 
@@ -12,16 +10,15 @@ def run() -> None:
 
     logger.info("Preparing the data...")
     dataset = TextGenerationDataset(config)
-    dataloader = DataLoader(dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True)
+    train_dl, test_dl = get_dataloaders(dataset)
 
-    vocab_size = len(dataset.tokenizer.vocab)
-    trainer = Trainer(config, vocab_size)
+    trainer = Trainer(config, dataset.tokenizer)
     logger.info(f"Number of trainable parameters: {count_parameters(trainer.model):,}")
-    logger.info(f"Vocabulary size: {vocab_size:,}")
+    logger.info(f"Vocabulary size: {len(dataset.tokenizer.vocab):,}")
 
     try:
         logger.info("Starting training...")
-        trainer.fit(dataloader)
+        trainer.fit(train_dl, test_dl)
     except KeyboardInterrupt:
         logger.info("Training terminated.")
 
