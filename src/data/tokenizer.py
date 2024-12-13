@@ -28,6 +28,13 @@ class Tokenizer:
     def decode(self, tensor: torch.Tensor) -> str:
         return "".join(self.vocab.id_to_token.get(token_id, Vocab.UNK_TOKEN["token"]) for token_id in tensor.tolist())
 
+    def compute_class_weights(self) -> torch.Tensor:
+        total_tokens = sum(self.vocab.token_freq.values())
+        weights = torch.tensor([
+            0 if freq == 0 else total_tokens / freq for freq in self.vocab.token_freq.values()
+        ])
+        return weights / weights.max()
+
     def save(self, filepath: Path) -> None:
         with open(filepath, "w") as file:
             json.dump({

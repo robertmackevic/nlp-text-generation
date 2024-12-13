@@ -12,7 +12,7 @@ class Vocab:
     @classmethod
     def init_from_text(cls, text: str) -> Self:
         token_to_id = {Vocab.UNK_TOKEN["token"]: Vocab.UNK_TOKEN["id"]}
-        token_freq = {}
+        token_freq = {Vocab.UNK_TOKEN["token"]: 0}
 
         for token in text:
             if token not in token_to_id:
@@ -24,7 +24,6 @@ class Vocab:
 
             token_freq[token] += 1
 
-        token_freq = dict(sorted(token_freq.items(), key=lambda item: item[1], reverse=True))
         return cls(token_to_id, token_freq)
 
     def __len__(self) -> int:

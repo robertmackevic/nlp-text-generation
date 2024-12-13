@@ -36,7 +36,7 @@ class Trainer:
         self.tokenizer = tokenizer
         self.model = LSTM(config, vocab_size=len(tokenizer.vocab)).to(self.device)
         self.optimizer = Adam(self.model.parameters(), lr=self.config.learning_rate)
-        self.loss_fn = CrossEntropyLoss().to(self.device)
+        self.loss_fn = CrossEntropyLoss(weight=tokenizer.compute_class_weights()).to(self.device)
 
     def fit(self, train_dl: DataLoader, val_dl: DataLoader) -> None:
         RUNS_DIR.mkdir(exist_ok=True, parents=True)
