@@ -1,7 +1,8 @@
 from argparse import Namespace, ArgumentParser
 
 from src.data.dataset import TextGenerationDataset, get_dataloaders
-from src.paths import RUNS_DIR, CONFIG_FILE
+from src.data.tokenizer import Tokenizer
+from src.paths import RUNS_DIR, CONFIG_FILE, TOKENIZER_FILE
 from src.trainer import Trainer
 from src.utils import get_logger, load_config, seed_everything, load_weights, count_parameters
 
@@ -21,13 +22,14 @@ def run(version: str, weights: str) -> None:
     seed_everything(config.seed)
 
     logger.info("Preparing the data...")
-    dataset = TextGenerationDataset(config)
+    tokenizer = Tokenizer.init_from_file(model_dir / TOKENIZER_FILE.name)
+    dataset = TextGenerationDataset(config, tokenizer)
     train_dl, test_dl = get_dataloaders(dataset)
 
-    trainer = Trainer(config, dataset.tokenizer)
+    trainer = Trainer(config, tokenizer)
     trainer.model = load_weights(filepath=model_dir / weights, model=trainer.model)
     logger.info(f"Number of trainable parameters: {count_parameters(trainer.model):,}")
-    logger.info(f"Vocabulary size: {len(dataset.tokenizer.vocab):,}")
+    logger.info(f"Vocabulary size: {len(tokenizer.vocab):,}")
 
     try:
         logger.info("Evaluating on training data...")
