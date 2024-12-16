@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import torch
+from torch.nn.functional import softmax
 
 from src.data.tokenizer import Tokenizer
 from src.lstm import LSTM
@@ -14,10 +15,11 @@ def parse_args() -> Namespace:
     parser.add_argument("-w", "--weights", type=str, required=True, help="Name of the .pth file")
     parser.add_argument("--seed-sequence", type=str, required=True, help="Text to start the inference")
     parser.add_argument("--max-tokens", type=int, required=True, help="Number of tokens to generate")
+    parser.add_argument("--temperature", type=float, required=False, default=0.0)
     return parser.parse_args()
 
 
-def run(version: str, weights: str, seed_sequence: str, max_tokens: int) -> None:
+def run(version: str, weights: str, seed_sequence: str, max_tokens: int, temperature: float) -> None:
     logger = get_logger()
     model_dir = RUNS_DIR / version
 
@@ -49,13 +51,21 @@ def run(version: str, weights: str, seed_sequence: str, max_tokens: int) -> None
 
     text = seed_sequence
     for _ in range(max_tokens):
-        source = tokenizer.encode(text[-config.context_length:]).unsqueeze(1).to(device)
+        source = tokenizer.encode(text[-config.context_length:]).unsqueeze(0).to(device)
 
         with torch.no_grad():
             output = model(source)
+
+        if temperature == 0.0:
             prediction = torch.argmax(output, dim=1)
 
-        text += tokenizer.decode(prediction.squeeze())
+        else:
+            logits = output[0, :]
+            logits = logits / temperature
+            probabilities = softmax(logits, dim=-1)
+            prediction = torch.multinomial(probabilities, num_samples=1)
+
+        text += tokenizer.decode(prediction)
 
     logger.info(text)
 

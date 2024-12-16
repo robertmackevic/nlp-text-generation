@@ -1,7 +1,7 @@
 from argparse import Namespace
 
 from torch import Tensor
-from torch.nn import Module, Embedding, Linear, LSTM as _LSTM
+from torch.nn import Module, Embedding, Linear, Dropout, LSTM as _LSTM
 
 
 class LSTM(Module):
@@ -10,6 +10,7 @@ class LSTM(Module):
         self.embedding = Embedding(vocab_size, config.embedding_dim)
         self.lstm = _LSTM(config.embedding_dim, config.hidden_dim, config.num_layers, batch_first=True)
         self.fc = Linear(config.hidden_dim, vocab_size)
+        self.dropout = Dropout(config.dropout)
 
     def forward(self, x: Tensor) -> Tensor:
         # [batch_size, seq_length]
@@ -17,6 +18,7 @@ class LSTM(Module):
         # [batch_size, seq_length, embedding_dim]
         x, _ = self.lstm(x)
         # [batch_size, seq_length, hidden_dim]
+        x = self.dropout(x)
         x = self.fc(x[:, -1, :])
         # [batch_size, vocab_size]
         return x
