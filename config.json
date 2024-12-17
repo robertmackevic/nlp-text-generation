@@ -1,6 +1,6 @@
 {
     "data": "milton-paradise.txt",
-    "test_fraction": 0.2,
+    "test_fraction": 0.1,
     "seed": 42,
     "window_step": 1,
     "context_length": 40,
@@ -15,5 +15,5 @@
     "embedding_dim": 128,
     "hidden_dim": 256,
     "num_layers": 2,
-    "dropout": 0.3
+    "dropout": 0.25
 }

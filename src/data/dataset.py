@@ -40,7 +40,7 @@ class TextGenerationDataset(Dataset):
         text = "\n".join(
             re.sub(r"[ \t]+", " ", string.lower().strip())
             for string in strings
-            if len(string) > 1 and "Book" not in string and not any(char in "0123456789[]()*$\\" for char in string)
+            if len(string) > 1 and "Book" not in string and not any(char in "0123456789[]()*$\\\"" for char in string)
         )
         return text
 

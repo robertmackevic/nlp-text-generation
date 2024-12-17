@@ -49,7 +49,7 @@ def run(version: str, weights: str, seed_sequence: str, max_tokens: int, tempera
         f"\nVocabulary size: {len(tokenizer.vocab):,}"
     )
 
-    text = seed_sequence
+    text = seed_sequence.replace(r"\n", "\n")
     for _ in range(max_tokens):
         source = tokenizer.encode(text[-config.context_length:]).unsqueeze(0).to(device)
 
@@ -67,7 +67,8 @@ def run(version: str, weights: str, seed_sequence: str, max_tokens: int, tempera
 
         text += tokenizer.decode(prediction)
 
-    logger.info(text)
+    logger.info("\n" + text)
+    logger.info(f"Length: {len(text)}")
 
 
 if __name__ == "__main__":
